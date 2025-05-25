@@ -1,0 +1,321 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+body {
+
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', /* Inter 폰트 적용 */
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #1a1a1a; /* 전체 배경색 (프레임 밖) */
+    color: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* --- 스마트폰 프레임 스타일 조정 --- */
+.phone-frame {
+    position: relative;
+    width: 420px; /* 프레임 너비를 늘림 (예: 380px -> 420px) */
+    height: 880px; /* 프레임 높이를 늘림 (예: 820px -> 880px) */
+    background-color: #000;
+    border-radius: 40px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px; /* 패딩을 늘려 내부 화면과의 간격 확보 (예: 15px -> 20px) */
+    box-sizing: border-box;
+}
+
+.phone-screen {
+    width: 100%;
+    height: 100%;
+    border-radius: 30px;
+    overflow: hidden;
+    background-color: #0d0d0d;
+    display: flex;
+    flex-direction: column;
+    padding-top: 10px; 
+}
+
+/* 노치 스타일 (동일) */
+.notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 25px;
+    background-color: black;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    z-index: 20;
+}
+
+/* 스마트폰 상태바 조정 */
+.status-bar-phone {
+    position: absolute;
+    top: 20px; /* 노치 아래로 더 내림 (예: 10px -> 25px) */
+    left: 0;
+    width: 100%;
+    padding: 0 35px; /* 좌우 여백을 늘림 (예: 25px -> 35px) */
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+    z-index: 21;
+}
+
+.network-icons-phone {
+    display: flex;
+    gap: 8px;
+}
+
+.wifi-icon-phone {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zM5 14l4 4 4-4c-2.76-2.76-7.24-2.76-10 0z"/></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.battery-level-phone {
+    display: inline-block;
+    width: 24px;
+    height: 16px;
+    border: 1.5px solid white;
+    border-radius: 3px;
+    position: relative;
+}
+.battery-level-phone::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -4px;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 6px;
+    background-color: white;
+    border-radius: 1px;
+}
+
+
+/* --- 기존 .App 스타일 (동일) --- */
+.App {
+    width: 100%;
+    background-color: #0d0d0d;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-grow: 1;
+}
+
+/* header의 wifi-icon은 이제 phone-status-bar에 포함되므로 제거 또는 수정 */
+.header .wifi-icon {
+    display: none;
+}
+
+/* --- header 스타일 조정 (메뉴 아이콘과의 간격 확보) --- */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px; /* 상하 패딩을 약간 줄이고 좌우 패딩을 유지 */
+    background-color: #0d0d0d;
+    border-bottom: 1px solid #000000;
+    position: relative;
+    z-index: 10;
+    box-shadow: 0px 40px 120px rgb(0, 0, 0);
+}
+
+.header h1 {
+    font-size: 34px;
+    font-family: 'Inter', sans-serif;
+    font-weight: bold;
+    color: #e0e0e0;
+    margin: 0;
+    flex-grow: 1;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.menu-icon {
+    font-size: 24px;
+    margin-top:10px;
+    color: #e0e0e0;
+    /* margin-right: auto; 이 부분은 이제 필요 없을 수도 있습니다. */
+    /* 대신 flex-start와 justify-content로 배치 */
+}
+
+/* 나머지 .css 파일 내용은 동일하게 유지합니다. */
+/* car-3d-container, status-cards-container, status-card, alert-message 등 */
+
+.car-3d-container {
+    width: 100%;
+    height: 400px;
+    background-color: #241f1f;
+    position: relative;
+    z-index: 1;
+     display: flex; /* 추가 */
+    justify-content: center; /* 추가 */
+    align-items: center; /* 추가 (필요에 따라) */
+    box-shadow: 0px 4px 10px rgb(12, 12, 12),
+    inset 0px -100px 50px -50px rgba(8, 8, 8, 0.8);
+}
+
+.status-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    flex-grow: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.status-card {
+    display: flex;
+    align-items: center;
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.status-card.normal {
+    border-left: 5px solid #28a745;
+}
+
+.status-card.fault {
+    border-left: 5px solid #dc3545;
+}
+
+.status-card .icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 15px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.status-card .battery-icon {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M16 4h-2V2h-4v2H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM8 6h8v14H8V6zM9 10h6v2H9v-2zm0 4h6v2H9v-2z"/></svg>');
+}
+
+.status-card .motor-icon {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15H9v-2h2v2zm0-4H9v-2h2v2zm0-4H9V7h2v2zm4 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg>');
+}
+
+.status-card .text-content {
+    flex-grow: 1;
+}
+
+.status-card h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #e0e0e0;
+}
+
+.status-card p {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: #a0a0a0;
+}
+
+.status-badge {
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-badge.normal {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+}
+
+.status-badge.fault {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+}
+
+.alert-message {
+    background-color: #ffc107;
+    color: #333;
+    padding: 20px 10px;
+    display: flex;
+    align-items: center;
+    border-radius: 12px;
+    margin: 8px;
+    font-weight: bold;
+    box-shadow: inset 0px -2px 10px rgba(0, 0, 0, 0.4), /* 아래로 더 진하고 넓게 */
+                0px 0px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+
+}
+
+.alert-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    color: #333;
+}
+
+.alert-message p {
+    margin: 0;
+    flex-grow: 1;
+}
+
+.arrow-icon {
+    width: 20px;
+    height: 20px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6-6-6z"/></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    color: #333;
+}
+
+.status-label .status-box {
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 12px;
+    color: white;
+    white-space: nowrap;
+}
+
+.status-label .status-box.normal {
+    background-color: rgba(40, 167, 69, 0.7);
+}
+
+.status-label .status-box.fault {
+    background-color: rgba(220, 53, 69, 0.7);
+}
+
+.status-label .status-text {
+    margin: 0;
+    font-weight: bold;
+}
+
+.status-label .status-value {
+    margin: 0;
+    font-size: 10px;
+}
