@@ -61,6 +61,31 @@ function App() {
 
     // 콘솔에서 호출할 함수들을 전역 window 객체에 노출
     React.useEffect(() => {
+
+         const fetchMotorStatus = async () => {
+            try {
+                // --- 중요: A 컴퓨터의 내부 IP 주소로 변경하세요! ---
+                const serverIpAddress = '192.168.0.19'; // 예: '192.168.0.100'
+                const response = await fetch(`http://${serverIpAddress}:5000/predict_motor_status`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log("Motor status received:", data.motorStatus);
+                setMotorStatus(data.motorStatus); // 상태 업데이트
+            } catch (error) {
+                console.error("Failed to fetch motor status:", error);
+                setMotorStatus(1); // 오류 발생 시 비정상으로 표시
+            }
+        };
+
+         // 초기 로드 시 한 번 호출
+        fetchMotorStatus();
+
+        // 5초마다 주기적으로 호출 (선택 사항)
+        const intervalId = setInterval(fetchMotorStatus, 3000);
+
         // 배터리 상태를 업데이트하는 함수
         window.setBatteryStatus = (status) => {
             if (status === 0 || status === 1) {
@@ -96,6 +121,7 @@ function App() {
 
         return () => {
             // 컴포넌트 언마운트 시 전역 함수 정리 (클린업)
+            clearInterval(intervalId);
             delete window.setBatteryStatus;
             delete window.setMotorStatus;
         };
