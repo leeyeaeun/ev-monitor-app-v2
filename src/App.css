@@ -198,6 +198,9 @@ body {
 .status-card.fault {
     border-left: 5px solid #dc3545;
 }
+.status-card.warning {
+    border-left: 5px solid #ff9100;
+}
 
 .status-card .icon {
     width: 30px;
@@ -250,9 +253,14 @@ body {
     color: #dc3545;
 }
 
+.status-badge.warning {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #ff9800;
+}
+
 .alert-message {
     background-color: #ffc107;
-    color: #333;
+    color: #141414;
     padding: 20px 10px;
     display: flex;
     align-items: center;
@@ -265,6 +273,15 @@ body {
     overflow: hidden;
 
 }
+/* alert-message.warning-alert (주황색) */
+.alert-message.warning-alert {
+    background-color: #ff9800; /* 주황색 */
+}
+
+/* alert-message.fault-alert (노란색 - 기존 alert-message의 색상과 동일하게) */
+.alert-message.fault-alert {
+    background-color: #ff4444;
+  } /* 노란색 (기존 alert-message의 색상) */
 
 .alert-icon {
     width: 24px;
@@ -305,7 +322,10 @@ body {
 .status-label .status-box.normal {
     background-color: rgba(40, 167, 69, 0.7);
 }
-
+/* 새로운 warning 상태 추가 */
+.status-label .status-box.warning {
+    background-color: rgba(255, 152, 0, 0.7); /* 주황색 투명 */
+}
 .status-label .status-box.fault {
     background-color: rgba(220, 53, 69, 0.7);
 }

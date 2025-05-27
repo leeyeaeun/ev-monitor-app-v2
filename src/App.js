@@ -22,7 +22,20 @@ function CarModel({ batteryStatus, motorStatus }) {
             });
         }
     }, [scene]);
+    // 상태에 따른 클래스 이름 매핑 함수
+    const getStatusClass = (status) => {
+        if (status === 0) return 'normal';
+        if (status === 1) return 'warning'; // 주의 상태
+        if (status === 2) return 'fault';   // 결함 상태
+        return ''; // 기본값
+    };
 
+    const getStatusText = (status) => {
+        if (status === 0) return 'Normal';
+        if (status === 1) return 'Warning';
+        if (status === 2) return 'Fault';
+        return 'Unknown';
+    };
     return (
         <group ref={modelRef} dispose={null}>
             <primitive object={scene}/>
@@ -33,9 +46,9 @@ function CarModel({ batteryStatus, motorStatus }) {
                 distanceFactor={350} // <--- 이 값을 조정합니다. (기본 10 -> 50으로 증가)
                 className="status-label battery-label"
             >
-                <div className={`status-box ${batteryStatus === 0 ? 'normal' : 'fault'}`}>
+                <div className={`status-box ${getStatusClass(batteryStatus)}`}>
                     <p className="status-text">Battery</p>
-                    <p className="status-value">{batteryStatus === 0 ? 'Normal' : 'Fault'}</p>
+                    <p className="status-value">{getStatusText(batteryStatus)}</p>
                 </div>
             </Html>
             {/* 모터 상태 표시 */}
@@ -45,9 +58,9 @@ function CarModel({ batteryStatus, motorStatus }) {
                 distanceFactor={350} // <--- 이 값을 조정합니다. (기본 10 -> 50으로 증가)
                 className="status-label motor-label"
             >
-                <div className={`status-box ${motorStatus === 0 ? 'normal' : 'fault'}`}>
+                <div className={`status-box ${getStatusClass(motorStatus)}`}>
                     <p className="status-text">Motor</p>
-                    <p className="status-value">{motorStatus === 0 ? 'Normal' : 'Fault'}</p>
+                    <p className="status-value">{getStatusText(motorStatus)}</p>
                 </div>
             </Html>
         </group>
@@ -68,64 +81,72 @@ function App() {
                 const serverIpAddress = '192.168.0.19'; // 예: '192.168.0.100'
                 const response = await fetch(`http://${serverIpAddress}:5000/predict_motor_status`);
 
-                if (!response.ok) {
+               if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
                 console.log("Motor status received:", data.motorStatus);
-                setMotorStatus(data.motorStatus); // 상태 업데이트
+                // 받아온 값이 0, 1, 2 중 하나인지 확인
+                if ([0, 1, 2].includes(data.motorStatus)) {
+                    setMotorStatus(data.motorStatus); // 상태 업데이트
+                } else {
+                    console.warn("Invalid motor status value received from server:", data.motorStatus);
+                    setMotorStatus(2); // 유효하지 않은 값은 결함으로 처리
+                }
             } catch (error) {
                 console.error("Failed to fetch motor status:", error);
-                setMotorStatus(1); // 오류 발생 시 비정상으로 표시
+                setMotorStatus(2); // 오류 발생 시 결함으로 표시 (이전 1 -> 2로 변경)
             }
-        };
+        }
 
          // 초기 로드 시 한 번 호출
         fetchMotorStatus();
 
         // 5초마다 주기적으로 호출 (선택 사항)
-        const intervalId = setInterval(fetchMotorStatus, 3000);
+        const intervalId = setInterval(fetchMotorStatus, 300000);
 
-        // 배터리 상태를 업데이트하는 함수
+         // 콘솔에서 수동으로 상태 변경을 위한 함수 (개발/디버깅용)
         window.setBatteryStatus = (status) => {
-            if (status === 0 || status === 1) {
+            if ([0, 1, 2].includes(status)) {
                 setBatteryStatus(status);
-                console.log(`배터리 상태 업데이트: ${status === 0 ? '정상 (0)' : '비정상 (1)'}`);
+                console.log(`배터리 상태 업데이트: ${getStatusText(status)} (${status})`);
             } else {
-                console.warn("잘못된 배터리 상태 값입니다. 0 또는 1을 입력하세요.");
+                console.warn("잘못된 배터리 상태 값입니다. 0, 1, 2 중 하나를 입력하세요.");
             }
         };
 
-        // 모터 상태를 업데이트하는 함수
         window.setMotorStatus = (status) => {
-            if (status === 0 || status === 1) {
+            if ([0, 1, 2].includes(status)) {
                 setMotorStatus(status);
-                console.log(`모터 상태 업데이트: ${status === 0 ? '정상 (0)' : '비정상 (1)'}`);
+                console.log(`모터 상태 업데이트: ${getStatusText(status)} (${status})`);
             } else {
-                console.warn("잘못된 모터 상태 값입니다. 0 또는 1을 입력하세요.");
+                console.warn("잘못된 모터 상태 값입니다. 0, 1, 2 중 하나를 입력하세요.");
             }
         };
-
-        // 초기 상태 설정 (앱 로드 시 기본적으로 정상 상태로 시작)
-        // fetchCarStatus() 호출은 필요 없게 되었습니다.
-        // 만약 초기 로딩 시 서버에서 값을 가져오고 싶다면 여기에 fetch 로직을 구현합니다.
-        // 예: setBatteryStatus(0); setMotorStatus(0);
-        // 또는 실제 서버 API 호출
-        // fetch('YOUR_API_ENDPOINT/status')
-        //   .then(response => response.json())
-        //   .then(data => {
-        //     setBatteryStatus(data.battery);
-        //     setMotorStatus(data.motor);
-        //   })
-        //   .catch(error => console.error('Error fetching car status:', error));
 
         return () => {
-            // 컴포넌트 언마운트 시 전역 함수 정리 (클린업)
+            // 컴포넌트 언마운트 시 클린업
             clearInterval(intervalId);
             delete window.setBatteryStatus;
             delete window.setMotorStatus;
         };
     }, []); // 빈 배열은 컴포넌트가 마운트될 때 한 번만 실행됨
+
+    // 상태에 따른 CSS 클래스를 반환하는 헬퍼 함수
+    const getStatusClass = (status) => {
+        if (status === 0) return 'normal';
+        if (status === 1) return 'warning';
+        if (status === 2) return 'fault';
+        return '';
+    };
+
+    const getStatusText = (status) => {
+        if (status === 0) return 'Normal';
+        if (status === 1) return 'Warning';
+        if (status === 2) return 'Fault';
+        return 'Unknown';
+    };
+ // 빈 배열은 컴포넌트가 마운트될 때 한 번만 실행됨
 
     return (
         // 새로운 컨테이너 추가: phone-frame
@@ -180,41 +201,58 @@ function App() {
             </div>
 
                     <div className="status-cards-container">
-                        <div className={`status-card ${batteryStatus === 0 ? 'normal' : 'fault'}`}>
+                        <div className={`status-card ${getStatusClass(batteryStatus)}`}>
                             <div className="icon battery-icon"></div>
                             <div className="text-content">
                                 <h3>Battery</h3>
-                                <p>{batteryStatus === 0 ? 'Normal' : 'Fault'}</p>
+                                <p>{getStatusText(batteryStatus)}</p>
                             </div>
-                            <div className={`status-badge ${batteryStatus === 0 ? 'normal' : 'fault'}`}>
-                                {batteryStatus === 0 ? 'Normal' : 'Fault'}
+                            <div className={`status-badge ${getStatusClass(batteryStatus)}`}>
+                                {getStatusText(batteryStatus)}
                             </div>
                         </div>
 
-                        <div className={`status-card ${motorStatus === 0 ? 'normal' : 'fault'}`}>
+                        <div className={`status-card ${getStatusClass(motorStatus)}`}>
                             <div className="icon motor-icon"></div>
                             <div className="text-content">
                                 <h3>Motor</h3>
-                                <p>{motorStatus === 0 ? 'Normal' : 'Fault'}</p>
+                                <p>{getStatusText(motorStatus)}</p>
                             </div>
-                            <div className={`status-badge ${motorStatus === 0 ? 'normal' : 'fault'}`}>
-                                {motorStatus === 0 ? 'Normal' : 'Fault'}
+                            <div className={`status-badge ${getStatusClass(motorStatus)}`}>
+                                {getStatusText(motorStatus)}
                             </div>
                         </div>
                     </div>
 
-                    {motorStatus === 1 && (
-                        <div className="alert-message">
+
+                    {/* 모터 상태에 따른 alert 메시지 */}
+                    {motorStatus === 1 && ( // 주의 상태일 때 주황색 alert
+                        <div className="alert-message warning-alert">
                             <div className="alert-icon"></div>
-                            <p>A motor fault has been detected.</p>
+                            <p>Motor System Warning Detected</p>
+                            <div className="arrow-icon"></div>
+                        </div>
+                    )}
+                    {motorStatus === 2 && ( // 결함 상태일 때 노란색 alert
+                        <div className="alert-message fault-alert">
+                            <div className="alert-icon"></div>
+                            <p>Motor System Anomaly Detected</p>
                             <div className="arrow-icon"></div>
                         </div>
                     )}
                     
-                    {batteryStatus === 1 && (
-                        <div className="alert-message">
+                    {/* 배터리 상태에 따른 alert 메시지 */}
+                    {batteryStatus === 1 && ( // 주의 상태일 때 주황색 alert
+                        <div className="alert-message warning-alert">
                             <div className="alert-icon"></div>
-                            <p>A battery fault has been detected.</p>
+                            <p>Battery System Warning Detected</p>
+                            <div className="arrow-icon"></div>
+                        </div>
+                    )}
+                    {batteryStatus === 2 && ( // 결함 상태일 때 노란색 alert
+                        <div className="alert-message fault-alert">
+                            <div className="alert-icon"></div>
+                            <p>Battery System Anomaly Detected</p>
                             <div className="arrow-icon"></div>
                         </div>
                     )}
